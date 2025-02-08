@@ -1,0 +1,31 @@
+/* *{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+} */
+.enquiry{
+    background-color:#ff0000;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    gap: 50px;
+}
+.Enow{
+    font-size: 16px;
+    font-weight: bold;
+    color: white;
+    font-family: sans-serif;
+    margin-left: 10px;
+}
+.call{
+    padding: 5px;
+    border-radius: 10px;
+    color: white;
+    font-size: 16px;
+    background-color: black;
+}
+.inno-logo{
+    margin-left: 35px;
+}
+
+
