@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: Arial, sans-serif;
+      }
+      body {
+        background-image: url("https://t3.ftcdn.net/jpg/02/64/00/56/360_F_264005624_NyFEBO7k0OsNMQiI343zBZZ7WH89f6Ls.jpg");
+        /* background-size: 100% 100%; */
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: cover;
+        /* height: 100vh; */
+        color: #fff;
+        padding: 20px;
+        animation: fadeIn Is ease-out;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+      }
+      body::before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: -1;
+      }
+      h1 {
+        font-size: 3rem;
+        margin-bottom: 20px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        animation: slideInFromLeft 1.5s ease-out;
+      }
+      .container {
+        display: flex;
+        width: 100%;
+        max-width: 1200px;
+      }
+      #foodCards {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        flex: 1;
+        padding-right: 320px;
+      }
+      .card {
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 8px;
+        padding: 15px;
+        width: 250px;
+        color: #333;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        text-align: center;
+        transition: transform 0.3s ease;
+      }
+      .card:hover {
+        transition: translateY(-5px);
+      }
+      .card img {
+        width: 200px;
+        height: 150px;
+        object-fit: cover;
+        border-radius: 5px;
+      }
+      .card h3 {
+        margin: 10px 0;
+        font-size: 1.5rem;
+      }
+      .card p {
+        font-size: 1.2rem;
+        margin: 10px 0;
+      }
+      .card button {
+        padding: 10px 20px;
+        font-size: 1rem;
+        cursor: pointer;
+        border: none;
+        border-radius: 5px;
+        background-color: #4caf50;
+        color: #fff;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+      }
+      .card button:hover {
+        background-color: #45a049;
+        transform: scaleX(1.05);
+      }
+      .card button:active {
+        transform: scale(0.98);
+      }
+      #sideCart {
+        position: fixed;
+        right: 20px;
+        top: 100px;
+        width: 300px;
+        background: rgba(0, 0, 0, 0.7);
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        z-index: 100;
+      }
+      #sideCart h2 {
+        font-size: 1.8rem;
+        margin-bottom: 10px;
+      }
+      #sideCart ul {
+        list-style-type: none;
+        padding: 0;
+        max-height: 400px;
+        overflow-y: auto;
+      }
+      #sideCart li {
+        padding: 10px;
+        border-bottom: 1px solid #555;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      #sideCart li:last-child {
+        border-bottom: none;
+      }
+      .order-item-info {
+        flex-grow: 1;
+        text-align: left;
+      }
+      .order-item-button button {
+        margin: 2px 2px;
+        padding: 4px 8px;
+        font-size: 0.8rem;
+        cursor: pointer;
+        border: none;
+        border-radius: 3px;
+        background-color: #4caf50;
+        color: #fff;
+        transition: background-color 0.3s ease;
+      }
+      .order-item-button button:hover {
+        background-color: #45a049;
+      }
+      #sideCart h3 {
+        font-size: 1.5rem;
+        margin-top: 10px;
+        text-align: right;
+      }
+      @keyframes fadeIn {
+        0% {
+          opacity: 0;
+        }
+        100% {
+          opacity: 1;
+        }
+      }
+      @keyframes slideInFromLeft {
+        0% {
+          transform: translateX(-100%);
+          opacity: 0;
+        }
+        100% {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Food Ordering System</h1>
+    <div class="container">
+      <!--Food Cart Section -->
+      <div id="foodCards">
+        <!-- food cards information will be displayed here -->
+      </div>
+      <div id="sideCart">
+        <h2>Your Order</h2>
+        <ul id="orderDisplay">
+          <li>Your Oder is empty</li>
+        </ul>
+        <h3>Total : $<span id="totalPrice">0.00</span></h3>
+      </div>
+    </div>
+
+    <script>
+      let menuData = [];
+
+      let result;
+      function fetchMenu() {
+        fetch("https://api.npoint.io/d48587410594df0f5932")
+          .then((response) => response.json())
+          .then((data) => {
+            menuData = data;
+            displayFoodCards();
+          });
+      }
+
+      function displayFoodCards() {
+        const foodCards = document.getElementById("foodCards");
+        let cardsHTML = " ";
+        menuData.forEach((food) => {
+          cardsHTML += `
+          <div class="card">
+            <img src="${food.food_image}" alt="${food.food_name}">
+            <h3>${food.food_name}</h3>
+            <p>${food.food_price}</p>
+            <button onclick="addTOOrder(${food.food_id})">Add to Cart</button>
+            </div>
+          `;
+        });
+        foodCards.innerHTML = cardsHTML;
+      }
+      fetchMenu();
+
+      function addTOOrder(food_id) {
+        const item = menuData.find((food) => food.food_id === food_id);
+        if (item) {
+          Order.addItem(item);
+        }
+      }
+
+      const Order = {
+        items: [],
+
+        addItem: function (item) {
+          const existing = this.items.find((i) => i.food_id == item.food_id);
+          if (existing) {
+            existing.quantity++;
+          } else {
+            const newItem = { ...item, quantity: 1 };
+            this.items.push(newItem);
+          }
+          updateOrderDisplay();
+        },
+        incItems: function (food_id) {
+          const item = this.items.find((i) => i.food_id === food_id);
+          if (item) {
+            item.quantity++;
+            updateOrderDisplay();
+          }
+        },
+        decItems: function (food_id) {
+          const item = this.items.find((i) => i.food_id === food_id);
+          if (item) {
+            item.quantity--;
+
+            if (item.quantity === 0) {
+              this.items = this.items.filter((i) => i.food_id !== food_id);
+            }
+          }
+          updateOrderDisplay();
+        },
+        removeItem: function (food_id) {
+          const item = this.items.filter((i) => i.food_id !== food_id);
+          updateOrderDisplay();
+        },
+        calculateTotal: function () {
+          let total = 0;
+          this.items.forEach((item) => {
+            total += item.food_price * item.quantity;
+          });
+          return total;
+        },
+      };
+
+      function updateOrderDisplay() {
+        const orderDisplay = document.getElementById("orderDisplay");
+        if (Order.items.length === 0) {
+          orderDisplay.innerHTML = "<li>Your Cart is Empty</li>";
+        } else {
+          let orderHtml = "";
+          Order.items.forEach((item) => {
+            orderHtml += `
+        <li>
+          <div class="order-item-info">
+            ${item.food_name} <br>
+            $${(item.food_price * item.quantity).toFixed(2)}
+          </div>
+          <div class="order-item-button">
+            <button onclick="Order.incItems(${item.food_id})">+</button>
+            <span>${item.quantity}</span>
+            <button onclick="Order.decItems(${item.food_id})">-</button>
+            <button onclick="Order.removeItem(${
+              item.food_id
+            })" style="background-color:#f44336;">Remove</button>
+          </div>
+        </li>
+      `;
+          });
+          orderDisplay.innerHTML = orderHtml;
+        }
+        document.getElementById("totalPrice").textContent =
+          Order.calculateTotal().toFixed(2);
+      }
+    </script>
+  </body>
+</html>
